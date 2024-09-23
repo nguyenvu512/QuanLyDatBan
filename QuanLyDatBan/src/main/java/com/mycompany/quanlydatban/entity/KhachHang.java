@@ -4,7 +4,6 @@
  */
 package com.mycompany.quanlydatban.entity;
 
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +20,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor // Tự động sinh constructor có tham số
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE) // tự động thêm private trước mỗi thuộc tính
-public class Ban {
-    String maBan = UUID.randomUUID().toString();
+public class KhachHang {
+    String maKhachHang;
+    String tenKhachHang;
+    String email;
+    String soDienThoai;
+    String diaChi;
 }
