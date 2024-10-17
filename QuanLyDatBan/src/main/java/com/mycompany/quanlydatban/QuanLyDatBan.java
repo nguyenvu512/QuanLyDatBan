@@ -3,7 +3,9 @@
  */
 package com.mycompany.quanlydatban;
 
-import com.mycompany.quanlydatban.entity.Ban;
+import com.mycompany.quanlydatban.GUI.MainGUI;
+import java.sql.SQLException;
+
 
 /**
  *
@@ -12,7 +14,7 @@ import com.mycompany.quanlydatban.entity.Ban;
 //tự động chỉnh format code: alt + shift + f
 public class QuanLyDatBan {
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws SQLException {
+        new MainGUI();
     }
 }
