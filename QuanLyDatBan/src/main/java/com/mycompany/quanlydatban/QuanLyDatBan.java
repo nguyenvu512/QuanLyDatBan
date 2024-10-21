@@ -3,6 +3,7 @@
  */
 package com.mycompany.quanlydatban;
 
+import com.mycompany.quanlydatban.GUI.DangNhap_GUI;
 import com.mycompany.quanlydatban.GUI.MainGUI;
 import java.sql.SQLException;
 
