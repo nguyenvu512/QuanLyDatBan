@@ -25,4 +25,4 @@ public class ChiTietHoaDon {
     HoaDonThanhToan hoaDon;
     MonAn monAn;
     int soLuong;
-}
+}   

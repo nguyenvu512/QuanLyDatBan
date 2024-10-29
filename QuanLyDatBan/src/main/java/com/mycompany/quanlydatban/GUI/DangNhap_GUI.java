@@ -5,11 +5,15 @@
 package com.mycompany.quanlydatban.GUI;
 
 import java.awt.Color;
+import java.awt.event.ItemEvent;
+import lombok.Data;
 
 /**
  *
  * @author ACER
  */
+
+@Data
 public class DangNhap_GUI extends javax.swing.JFrame {
 
     /**
@@ -21,12 +25,21 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         initComponents();
         setVisible(true);
         setBounds(100, 100, 670, 400);
-	setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
         
         btn_dangNhap.setBackground(color_bg);
         btn_thoat.setBackground(color_bg);
+
+//        checkbox hiện mật khẩu
+        checkBoxMK.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                txt_matKhau.setEchoChar((char) 0);
+            } else {
+                txt_matKhau.setEchoChar('•');
+            }
+        });
     }
 
     /**
@@ -46,7 +59,7 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         btn_dangNhap = new javax.swing.JButton();
         btn_thoat = new javax.swing.JButton();
         txt_matKhau = new javax.swing.JPasswordField();
-        jCheckBox1 = new javax.swing.JCheckBox();
+        checkBoxMK = new javax.swing.JCheckBox();
         jLabel4 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -56,7 +69,7 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel1.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel1.setFont(new java.awt.Font("JetBrains Mono", 1, 22)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("JetBrains Mono ExtraBold", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Đăng nhập");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -70,6 +83,7 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("JetBrains Mono ExtraLight", 0, 14)); // NOI18N
         jLabel3.setText("Mật khẩu:");
 
+        txt_tenDangNhap.setFont(new java.awt.Font("JetBrains Mono", 0, 14)); // NOI18N
         txt_tenDangNhap.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txt_tenDangNhapActionPerformed(evt);
@@ -89,12 +103,14 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         btn_thoat.setForeground(new java.awt.Color(255, 255, 255));
         btn_thoat.setText("Thoát");
 
-        jCheckBox1.setBackground(new java.awt.Color(255, 255, 255));
-        jCheckBox1.setFont(new java.awt.Font("JetBrains Mono ExtraLight", 0, 12)); // NOI18N
-        jCheckBox1.setText("Hiện mật khẩu");
-        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+        txt_matKhau.setFont(new java.awt.Font("JetBrains Mono", 0, 14)); // NOI18N
+
+        checkBoxMK.setBackground(new java.awt.Color(255, 255, 255));
+        checkBoxMK.setFont(new java.awt.Font("JetBrains Mono ExtraLight", 0, 12)); // NOI18N
+        checkBoxMK.setText("Hiện mật khẩu");
+        checkBoxMK.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jCheckBox1ActionPerformed(evt);
+                checkBoxMKActionPerformed(evt);
             }
         });
 
@@ -102,30 +118,33 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(61, 61, 61))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btn_dangNhap, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2)
                     .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(checkBoxMK, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(txt_matKhau, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 216, Short.MAX_VALUE)
+                            .addComponent(txt_tenDangNhap, javax.swing.GroupLayout.Alignment.TRAILING))))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(84, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(103, 103, 103))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(btn_thoat, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txt_tenDangNhap)
-                            .addComponent(txt_matKhau, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(jCheckBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 49, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addGap(18, 18, 18)
+                        .addComponent(btn_dangNhap, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,21 +160,21 @@ public class DangNhap_GUI extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(txt_matKhau, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jCheckBox1)
-                .addGap(20, 20, 20)
+                .addComponent(checkBoxMK)
+                .addGap(26, 26, 26)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btn_dangNhap, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btn_thoat, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(117, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(317, 0, 340, 372));
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(277, 0, 380, 372));
 
         jLabel4.setBackground(new java.awt.Color(255, 255, 255));
         jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setIcon(new javax.swing.ImageIcon("D:\\PTUD\\QuanLyDatBan\\QuanLyDatBan\\QuanLyDatBan\\icon\\dangNhap.png")); // NOI18N
+        jLabel4.setIcon(new javax.swing.ImageIcon("D:\\PTUD\\QuanLyDatBan\\QuanLyDatBan\\QuanLyDatBan\\icon\\dangNhap1.png")); // NOI18N
         jLabel4.setOpaque(true);
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 320, 372));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 280, 372));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -168,9 +187,9 @@ public class DangNhap_GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_btn_dangNhapActionPerformed
 
-    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+    private void checkBoxMKActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxMKActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jCheckBox1ActionPerformed
+    }//GEN-LAST:event_checkBoxMKActionPerformed
 
     /**
      * @param args the command line arguments
@@ -179,7 +198,7 @@ public class DangNhap_GUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_dangNhap;
     private javax.swing.JButton btn_thoat;
-    private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JCheckBox checkBoxMK;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

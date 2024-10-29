@@ -4,13 +4,13 @@
  */
 package com.mycompany.quanlydatban.entity;
 
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
+
 /**
  *
  * @author ACER
@@ -20,17 +20,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor // Tự động sinh constructor có tham số
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE) // tự động thêm private trước mỗi thuộc tính
-public class HoaDonThanhToan {
-    String maHoaDon;
-    BanAn banAn;
+public class TaiKhoan {
+    String tenDangNhap;
+    String matKhau;
     NhanVien nhanVien;
-    KhachHang khachHang;
-    String ghiChu;
-    double tienCoc;
-    LocalDateTime ngayDatBan;
-    EnumTrangThaiDatBan trangThai;
-    double tongTien;
-    final double VAT = 0.06;
-    KhuyenMai khuyenMai;
-    
 }

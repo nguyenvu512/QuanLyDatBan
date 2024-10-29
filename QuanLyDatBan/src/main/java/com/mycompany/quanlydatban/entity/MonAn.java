@@ -25,6 +25,6 @@ public class MonAn {
     String tenMonAn;
     double giaTien;
     String moTa;
-    Byte[] hinhAnh;
+    String hinhAnh;
     DanhMucMonAn danhMuc;
 }
