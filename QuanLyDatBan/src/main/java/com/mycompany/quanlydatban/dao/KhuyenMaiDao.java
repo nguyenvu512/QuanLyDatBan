@@ -16,8 +16,8 @@ import java.util.List;
  *
  * @author Vo Van Tuong
  */
-public class KhuyenMai_Dao {
-    public KhuyenMai_Dao (){
+public class KhuyenMaiDao {
+    public KhuyenMaiDao (){
         
     }
     

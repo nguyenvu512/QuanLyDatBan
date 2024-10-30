@@ -18,10 +18,10 @@ import java.util.List;
  *
  * @author Vo Van Tuong
  */
-public class NhanVien_DAO {
-    public NhanVien_DAO(){
+public class NhanVienDAO {
+    public NhanVienDAO(){
     }
-    public List<NhanVien> getAllNhanVien() {
+    public static List<NhanVien> getAllNhanVien() {
       List<NhanVien> dsNhanVien = new ArrayList<>();
         try {
             java.sql.Connection con = Connection.getConnection();
@@ -124,7 +124,7 @@ public class NhanVien_DAO {
         return n > 0;
     }
 
-    public NhanVien tim(String maNV) {
+    public static NhanVien tim(String maNV) {
         java.sql.Connection con = Connection.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;

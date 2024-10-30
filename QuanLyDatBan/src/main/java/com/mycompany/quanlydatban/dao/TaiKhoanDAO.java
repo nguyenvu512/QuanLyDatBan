@@ -13,7 +13,7 @@ import java.sql.SQLException;
  *
  * @author ACER
  */
-public class TaiKhoan_DAO {
+public class TaiKhoanDAO {
     
     public static TaiKhoan timKiem(String tenDangNhap){
         try {

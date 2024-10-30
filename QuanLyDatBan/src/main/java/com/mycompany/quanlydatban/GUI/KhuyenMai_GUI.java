@@ -4,7 +4,7 @@
  */
 package com.mycompany.quanlydatban.GUI;
 
-import com.mycompany.quanlydatban.dao.KhuyenMai_Dao;
+import com.mycompany.quanlydatban.dao.KhuyenMaiDao;
 import com.mycompany.quanlydatban.entity.KhuyenMai;
 import com.toedter.calendar.JDateChooser;
 import java.awt.BorderLayout;
@@ -35,7 +35,7 @@ public class KhuyenMai_GUI extends javax.swing.JPanel {
      Color color_bg = Color.decode("#00405d");
     private final JDateChooser dateChooser;
     private final JDateChooser datechooserEnd;
-    private KhuyenMai_Dao km_d;
+    private KhuyenMaiDao km_d;
     public KhuyenMai_GUI() {
         initComponents();
         setLayout(new BorderLayout());
@@ -93,7 +93,7 @@ public class KhuyenMai_GUI extends javax.swing.JPanel {
     }
     
     public void  datatoTable(){
-         KhuyenMai_Dao km_d = new KhuyenMai_Dao();
+         KhuyenMaiDao km_d = new KhuyenMaiDao();
         List<KhuyenMai> list = km_d.getAllKhuyenMai();
         for(KhuyenMai km: list)
         {
@@ -334,7 +334,7 @@ public class KhuyenMai_GUI extends javax.swing.JPanel {
         LocalDate nBD = dateChooser.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
         LocalDate nKT = datechooserEnd.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
          KhuyenMai KM = new KhuyenMai(maKM, tenKM, nBD, nKT, mucKM);
-         km_d = new KhuyenMai_Dao();
+         km_d = new KhuyenMaiDao();
          if(km_d.them(KM))
          {
              dtm.setRowCount(0);
@@ -345,7 +345,7 @@ public class KhuyenMai_GUI extends javax.swing.JPanel {
     private void jb_SuaKMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_SuaKMActionPerformed
         // TODO add your handling code here:
         String maKm = jt_MaKM.getText();
-        KhuyenMai_Dao km_d = new KhuyenMai_Dao();
+        KhuyenMaiDao km_d = new KhuyenMaiDao();
         KhuyenMai KM = km_d.tim(maKm);
         if(KM!= null)
         {

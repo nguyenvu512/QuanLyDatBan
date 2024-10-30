@@ -17,7 +17,7 @@ public class Connection {
 
     private static final String url = "jdbc:sqlserver://localhost:1433;databaseName=DAT_BAN_NHA_HANG;Encrypt=True;TrustServerCertificate=True";
     private static final String username = "sa";
-    private static final String password = "vu5122004";         
+    private static final String password = "12345678";         
     
     public static java.sql.Connection getConnection() {
         try {

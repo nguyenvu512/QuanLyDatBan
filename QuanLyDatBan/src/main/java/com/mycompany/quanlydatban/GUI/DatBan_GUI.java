@@ -247,6 +247,7 @@ public class DatBan_GUI extends javax.swing.JPanel {
         label_thanhTien.setText(currencyFormat.format(THANH_TIEN));
         label_tongThanhToan.setText(currencyFormat.format(TONG_TIEN));
         label_vat.setText(currencyFormat.format(vat));
+        
     }
 
     /**

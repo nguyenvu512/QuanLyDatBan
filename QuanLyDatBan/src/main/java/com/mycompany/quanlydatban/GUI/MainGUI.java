@@ -237,7 +237,6 @@ public class MainGUI extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1280, 720));
         getContentPane().setLayout(null);
 
         jp_menu.setBackground(new java.awt.Color(255, 255, 255));
@@ -368,6 +367,11 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_NhanVien.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         menuItem_NhanVien.setIconTextGap(30);
         menuItem_NhanVien.setPreferredSize(new java.awt.Dimension(72, 30));
+        menuItem_NhanVien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_NhanVienActionPerformed(evt);
+            }
+        });
         jp_menu.add(menuItem_NhanVien, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 260, 50));
 
         menuItem_ThongKe.setFont(new java.awt.Font("JetBrains Mono Medium", 1, 18)); // NOI18N
@@ -378,6 +382,11 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_ThongKe.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         menuItem_ThongKe.setIconTextGap(30);
         menuItem_ThongKe.setPreferredSize(new java.awt.Dimension(72, 30));
+        menuItem_ThongKe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_ThongKeActionPerformed(evt);
+            }
+        });
         jp_menu.add(menuItem_ThongKe, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 490, 260, 50));
 
         getContentPane().add(jp_menu);
@@ -502,6 +511,22 @@ public class MainGUI extends javax.swing.JFrame {
     private void menuItem_TaiKhoanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_TaiKhoanActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_menuItem_TaiKhoanActionPerformed
+
+    private void menuItem_NhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_NhanVienActionPerformed
+        // TODO add your handling code here:
+        jp_root_center.removeAll();
+        jp_root_center.add(new NhanVienGUI());
+        jp_root_center.revalidate();
+        jp_root_center.repaint();
+    }//GEN-LAST:event_menuItem_NhanVienActionPerformed
+
+    private void menuItem_ThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_ThongKeActionPerformed
+        // TODO add your handling code here:
+        jp_root_center.removeAll();
+        jp_root_center.add(new ThongKe_GUI());
+        jp_root_center.revalidate();
+        jp_root_center.repaint();
+    }//GEN-LAST:event_menuItem_ThongKeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_main_img;

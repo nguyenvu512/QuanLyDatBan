@@ -4,7 +4,7 @@
  */
 package com.mycompany.quanlydatban.GUI;
 
-import com.mycompany.quanlydatban.dao.NhanVien_DAO;
+import com.mycompany.quanlydatban.dao.NhanVienDAO;
 import com.mycompany.quanlydatban.entity.EnumChucVu;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -507,7 +507,7 @@ public class NhanVienGUI extends javax.swing.JPanel {
                     null // Default option (null means first button, "Yes")
             );
             if (result == JOptionPane.YES_OPTION) {
-                NhanVien_DAO nv_d = new NhanVien_DAO();
+                NhanVienDAO nv_d = new NhanVienDAO();
                 if (nv_d.xoaNV(dtm.getValueAt(r, 0).toString())) {
                     dtm.setRowCount(0);
                     dataToTable();
@@ -520,7 +520,7 @@ public class NhanVienGUI extends javax.swing.JPanel {
     private void bt_SuaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_SuaActionPerformed
         // TODO add your handling code here:
         String maNV = jt_MaNV.getText();
-        NhanVien_DAO nv_d = new NhanVien_DAO();
+        NhanVienDAO nv_d = new NhanVienDAO();
         NhanVien nv = nv_d.tim(maNV);
         if (nv != null) {
             String teNV = jt_TenNV.getText();
@@ -566,7 +566,7 @@ public class NhanVienGUI extends javax.swing.JPanel {
             phai = false;
         }
         NhanVien nv = new NhanVien(maNV, tenNV, email, SDT, diaChi, phai, ngaySinh, isNhanVien ? EnumChucVu.NHAN_VIEN : EnumChucVu.QUAN_LY);
-        NhanVien_DAO nv_d = new NhanVien_DAO();
+        NhanVienDAO nv_d = new NhanVienDAO();
 
         if (nv_d.themNV(nv)) {
             dtm.setRowCount(0);
@@ -626,7 +626,7 @@ public class NhanVienGUI extends javax.swing.JPanel {
     private void bt_TimActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bt_TimActionPerformed
         // TODO add your handling code here:
         String maNV = jt_tim.getText();
-        NhanVien_DAO nv_d = new NhanVien_DAO();
+        NhanVienDAO nv_d = new NhanVienDAO();
         NhanVien nv = nv_d.tim(maNV);
         if(nv!=null)
         {
@@ -772,7 +772,7 @@ public void  xoaTrang()
     private javax.swing.JTable jtable;
     private javax.swing.JLabel lb_QLNV;
     // End of variables declaration//GEN-END:variables
-    private NhanVien_DAO nv_d = new NhanVien_DAO();
+    private NhanVienDAO nv_d = new NhanVienDAO();
     private DefaultTableModel dtm;
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
     private boolean isNhanVien = true;
