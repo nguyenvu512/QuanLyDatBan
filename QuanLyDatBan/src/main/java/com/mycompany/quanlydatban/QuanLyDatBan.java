@@ -5,6 +5,7 @@ package com.mycompany.quanlydatban;
 
 import com.mycompany.quanlydatban.GUI.DangNhap_GUI;
 import com.mycompany.quanlydatban.GUI.DanhSachBan_GUI;
+import com.mycompany.quanlydatban.GUI.HoaDonPDFExporter;
 import com.mycompany.quanlydatban.GUI.MainGUI;
 import com.mycompany.quanlydatban.dao.BanAnDAO;
 import com.mycompany.quanlydatban.dao.ChiTietHoaDonDAO;
@@ -21,6 +22,7 @@ import com.mycompany.quanlydatban.entity.HoaDonThanhToan;
 import com.mycompany.quanlydatban.entity.KhachHang;
 import com.mycompany.quanlydatban.entity.MonAn;
 import com.mycompany.quanlydatban.entity.NhanVien;
+import com.mycompany.quanlydatban.entity.TaiKhoan;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,12 +41,15 @@ public class QuanLyDatBan {
 //        KhachHangDao.themKhachHang(new KhachHang("KH001", "Trần Nguyên Vũ", "vu5122003@gmail.com", "039292292", "58 Nguyễn Du"));
         BanAn ban = BanAnDAO.getAllBan().get(0);
         KhachHang kh = KhachHangDao.getAllKhachHang().get(0);
-        NhanVien nv = NhanVienDAO.getAllNhanVien().get(0);
+        NhanVien nv = NhanVienDAO.tim("NV123");
         MonAn monan = MonAnDAO.getAllMonAn().get(0);
 //        HoaDonDAO.themHoaDon(new HoaDonThanhToan("abc123", ban, nv, kh, "", 500000,LocalDateTime.now(), EnumTrangThaiDatBan.DA_DAT,1000000, null));
-        new MainGUI();
+//        new MainGUI(nv);
 //        System.out.println(HoaDonDAO.timHoaDonTheoMa("25f72995-4206-4eb3-87d7-73e5f47a5b52"));
-//        new DangNhap_GUI();
+        new DangNhap_GUI();
+//        HoaDonThanhToan hd = HoaDonDAO.timHoaDonTheoMa("0464bb09-9b53-4eb8-b541-61568e37a168");
+//        HoaDonPDFExporter.xuatHoaDonPDF(hd);
+        
 //        ChiTietHoaDonDAO.themChiTietHoaDon(new ChiTietHoaDon("2i29eww", HoaDonDAO.getDanhSachHoaDon().get(0),monan, 1 ));
     }
 }

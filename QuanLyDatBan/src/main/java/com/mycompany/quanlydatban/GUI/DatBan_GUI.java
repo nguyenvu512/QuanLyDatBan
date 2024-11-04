@@ -4,10 +4,12 @@
  */
 package com.mycompany.quanlydatban.GUI;
 
+import com.itextpdf.text.pdf.PdfWriter;
 import com.mycompany.quanlydatban.dao.ChiTietHoaDonDAO;
 import com.mycompany.quanlydatban.dao.DanhMucMonAnDAO;
 import com.mycompany.quanlydatban.dao.HoaDonDAO;
 import com.mycompany.quanlydatban.dao.KhachHangDao;
+import com.mycompany.quanlydatban.dao.KhuyenMaiDao;
 import com.mycompany.quanlydatban.dao.MonAnDAO;
 import com.mycompany.quanlydatban.dao.NhanVienDAO;
 import com.mycompany.quanlydatban.entity.BanAn;
@@ -16,6 +18,7 @@ import com.mycompany.quanlydatban.entity.DanhMucMonAn;
 import com.mycompany.quanlydatban.entity.EnumTrangThaiDatBan;
 import com.mycompany.quanlydatban.entity.HoaDonThanhToan;
 import com.mycompany.quanlydatban.entity.KhachHang;
+import com.mycompany.quanlydatban.entity.KhuyenMai;
 import com.mycompany.quanlydatban.entity.MonAn;
 import com.mycompany.quanlydatban.entity.NhanVien;
 import java.awt.BorderLayout;
@@ -26,9 +29,11 @@ import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileOutputStream;
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,6 +51,8 @@ import javax.swing.SpinnerDateModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import org.apache.poi.wp.usermodel.Paragraph;
+import org.apache.poi.xwpf.usermodel.Document;
 
 /**
  *
@@ -73,17 +80,35 @@ public class DatBan_GUI extends javax.swing.JPanel {
     MainGUI mainGUI;
     DanhSachBan_GUI danhSachBan_GUI;
     HoaDonThanhToan hoaDonThanhToan;
-
-    public DatBan_GUI(BanAn banAn, HoaDonThanhToan hoaDonThanhToan, MainGUI main, DanhSachBan_GUI danhSachBan_GUI) {
+    LocalDateTime ngayDatBan;
+    KhuyenMai khuyenMai;
+    double TIEN_KHUYEN_MAI = 0;
+    NhanVien nhanVien;
+    
+    public DatBan_GUI(BanAn banAn, HoaDonThanhToan hoaDonThanhToan, MainGUI main, DanhSachBan_GUI danhSachBan_GUI, LocalDateTime ngayDatBan) {
         initComponents();
-        this.mainGUI=main;
+        this.mainGUI = main;
         this.banAn = banAn;
+        this.nhanVien=main.getNhanVien();
         this.hoaDonThanhToan = hoaDonThanhToan;
-        this.danhSachBan_GUI=danhSachBan_GUI;
-        
+        this.danhSachBan_GUI = danhSachBan_GUI;
+
+        if (hoaDonThanhToan != null) {
+            this.ngayDatBan = hoaDonThanhToan.getNgayDatBan();
+            this.khuyenMai = hoaDonThanhToan.getKhuyenMai();
+        }
+        if (ngayDatBan != null) {
+            this.ngayDatBan = ngayDatBan;
+        }
+        if (hoaDonThanhToan == null) {
+            btn_huyBan.setEnabled(false);
+            btn_thanhToan.setEnabled(false);
+            this.khuyenMai=null;
+        }
+
         jp_thongTinMonAn.setLayout(new GridLayout(0, 3, 10, 10)); // 5 cột, khoảng cách giữa các bàn là 10px
 
-        label_tenBan.setText(banAn.getMaBan());    
+        label_tenBan.setText(banAn.getMaBan());
 
         listMonAn = MonAnDAO.getAllMonAn();
         for (int i = 0; i < listMonAn.size(); i++) {
@@ -111,6 +136,22 @@ public class DatBan_GUI extends javax.swing.JPanel {
             // Đặt chữ ở dưới icon
             btn_monAn.setVerticalTextPosition(SwingConstants.BOTTOM);
             btn_monAn.setHorizontalTextPosition(SwingConstants.CENTER);
+            
+//            load khuyến mãi
+            if(hoaDonThanhToan==null){
+                List<KhuyenMai> listKhuyenMai = KhuyenMaiDao.getAllKhuyenMaiHieuLuc(ngayDatBan.toLocalDate());
+                if(listKhuyenMai.size() != 0){
+                    this.khuyenMai=listKhuyenMai.get(0);
+                    for(KhuyenMai km : listKhuyenMai){
+                        if(km.getGiamGia()>this.khuyenMai.getGiamGia()){
+                            this.khuyenMai=km;
+                        }
+                    }
+                }
+            }
+            if(khuyenMai != null){
+                label_tenKM.setText("(" + this.khuyenMai.getTenKhuyenMai() + ")");
+            }
 
 //            sự kiện nhấn nút chọn món 
             MonAn monAn = listMonAn.get(i);
@@ -145,8 +186,10 @@ public class DatBan_GUI extends javax.swing.JPanel {
                                 }
                                 THANH_TIEN += monAn.getGiaTien() * soLuong;
                                 vat = THANH_TIEN / 100 * 6;
-                                TONG_TIEN = THANH_TIEN + vat;
-
+                                if(khuyenMai != null){
+                                    TIEN_KHUYEN_MAI=THANH_TIEN/100*(khuyenMai.getGiamGia());
+                                }
+                                TONG_TIEN = THANH_TIEN + vat - TIEN_KHUYEN_MAI;
                             } else {
                                 JOptionPane.showMessageDialog(null, "Số lượng phải lớn hơn 0.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                             }
@@ -154,9 +197,11 @@ public class DatBan_GUI extends javax.swing.JPanel {
                             JOptionPane.showMessageDialog(null, "Vui lòng nhập một số hợp lệ.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                         }
                     }
+                    
                     label_thanhTien.setText(currencyFormat.format(THANH_TIEN));
                     label_vat.setText(currencyFormat.format(vat));
                     label_tongThanhToan.setText(currencyFormat.format(TONG_TIEN));
+                    label_khuyenMai.setText(currencyFormat.format(TIEN_KHUYEN_MAI));
                 }
             });
 
@@ -190,7 +235,12 @@ public class DatBan_GUI extends javax.swing.JPanel {
         JSpinner.DateEditor editor = new JSpinner.DateEditor(spinnerNgayGio, "dd/MM/yyyy | HH:mm:ss");
         spinnerNgayGio.setEditor(editor);
         spinnerNgayGio.setFont(new java.awt.Font("JetBrains Mono NL ExtraBold", 0, 14));
+        spinnerNgayGio.addChangeListener(e -> {
+            Date selectedDate = (Date) spinnerNgayGio.getValue();
+            LocalDateTime date1LocalDateTime = selectedDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
+            this.ngayDatBan = date1LocalDateTime;
+        });
         jp_ngayGio.add(spinnerNgayGio, BorderLayout.CENTER);
 
 //        bảng ds món đã đặt
@@ -220,30 +270,39 @@ public class DatBan_GUI extends javax.swing.JPanel {
         btn_huyBan.setBackground(color_bg);
         btn_thanhToan.setBackground(color_bg);
         btn_thoat.setBackground(color_bg);
-        
-        if(hoaDonThanhToan != null){
+
+        if (hoaDonThanhToan == null) {
+            Date date = Date.from(ngayDatBan.atZone(ZoneId.systemDefault()).toInstant()); // Chuyển đổi
+            spinnerNgayGio.setValue(date); // Gán giá trị cho JSpinner
+        }
+
+        if (hoaDonThanhToan != null) {
+            btn_datBan.setText("Thay đổi TT");
             //        gắn thông tin:
-        txt_tenKhachHang.setText(hoaDonThanhToan.getKhachHang().getTenKhachHang());
-        txt_soDienThoai.setText(hoaDonThanhToan.getKhachHang().getSoDienThoai());
-        txt_diaChi.setText(hoaDonThanhToan.getKhachHang().getDiaChi());
-        txt_email.setText(hoaDonThanhToan.getKhachHang().getEmail());
-        txt_ghiChu.setText(hoaDonThanhToan.getGhiChu());
-        txt_tienCoc.setText(currencyFormat.format(hoaDonThanhToan.getTienCoc()));
-        // Chuyển đổi LocalDateTime thành Date và gán cho JSpinner
-        LocalDateTime ngayDatBan = hoaDonThanhToan.getNgayDatBan(); // Lấy ngày từ hóa đơn
-        Date date = Date.from(ngayDatBan.atZone(ZoneId.systemDefault()).toInstant()); // Chuyển đổi
-        spinnerNgayGio.setValue(date); // Gán giá trị cho JSpinner
-        
-        List<ChiTietHoaDon> cthd = ChiTietHoaDonDAO.getDanhSachChiTietHoaDon(hoaDonThanhToan.getMaHoaDon());
-            for(ChiTietHoaDon ct:cthd){
-                 String tien1 = currencyFormat.format(ct.getMonAn().getGiaTien());
+            txt_tenKhachHang.setText(hoaDonThanhToan.getKhachHang().getTenKhachHang());
+            txt_soDienThoai.setText(hoaDonThanhToan.getKhachHang().getSoDienThoai());
+            txt_diaChi.setText(hoaDonThanhToan.getKhachHang().getDiaChi());
+            txt_email.setText(hoaDonThanhToan.getKhachHang().getEmail());
+            txt_ghiChu.setText(hoaDonThanhToan.getGhiChu());
+            txt_tienCoc.setText(String.valueOf(hoaDonThanhToan.getTienCoc()));
+            // Chuyển đổi LocalDateTime thành Date và gán cho JSpinner
+            LocalDateTime ngayDatBan1 = hoaDonThanhToan.getNgayDatBan();
+            Date date = Date.from(ngayDatBan1.atZone(ZoneId.systemDefault()).toInstant()); // Chuyển đổi
+            spinnerNgayGio.setValue(date); // Gán giá trị cho JSpinner
+
+            List<ChiTietHoaDon> cthd = ChiTietHoaDonDAO.getDanhSachChiTietHoaDon(hoaDonThanhToan.getMaHoaDon());
+            for (ChiTietHoaDon ct : cthd) {
+                String tien1 = currencyFormat.format(ct.getMonAn().getGiaTien());
                 model_dsMonAn.addRow(new Object[]{ct.getMonAn().getTenMonAn(), ct.getSoLuong(), tien1});
                 THANH_TIEN += ct.getMonAn().getGiaTien() * ct.getSoLuong();
-                                vat = THANH_TIEN / 100 * 6;
-                                TONG_TIEN = THANH_TIEN + vat;
-
+                vat = THANH_TIEN / 100 * 6;
+                if(khuyenMai != null){
+                    TIEN_KHUYEN_MAI = THANH_TIEN/100*(khuyenMai.getGiamGia());
+                }
+                TONG_TIEN = THANH_TIEN + vat - TIEN_KHUYEN_MAI;
             }
         }
+        label_khuyenMai.setText(currencyFormat.format(TIEN_KHUYEN_MAI));
         label_thanhTien.setText(currencyFormat.format(THANH_TIEN));
         label_tongThanhToan.setText(currencyFormat.format(TONG_TIEN));
         label_vat.setText(currencyFormat.format(vat));
@@ -287,7 +346,7 @@ public class DatBan_GUI extends javax.swing.JPanel {
         jp_danhSachMonDat = new javax.swing.JPanel();
         jp_thanhToan = new javax.swing.JPanel();
         label_vat = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        label_tenKM = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         label_thanhTien = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
@@ -463,9 +522,8 @@ public class DatBan_GUI extends javax.swing.JPanel {
         label_vat.setText("0 vnđ");
         jp_thanhToan.add(label_vat, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 40, 130, 20));
 
-        jLabel12.setFont(new java.awt.Font("JetBrains Mono ExtraLight", 2, 12)); // NOI18N
-        jLabel12.setText("(Giảm 10% nhân dịp 20/10)");
-        jp_thanhToan.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, -1, 20));
+        label_tenKM.setFont(new java.awt.Font("JetBrains Mono ExtraLight", 2, 12)); // NOI18N
+        jp_thanhToan.add(label_tenKM, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 80, -1, 20));
 
         jLabel13.setFont(new java.awt.Font("JetBrains Mono", 1, 12)); // NOI18N
         jLabel13.setText("VAT(6%):");
@@ -547,6 +605,8 @@ public class DatBan_GUI extends javax.swing.JPanel {
         jp_thanhToan.setBounds(630, 360, 390, 230);
     }// </editor-fold>//GEN-END:initComponents
 
+    
+    
     private void txt_tenKhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txt_tenKhachHangActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txt_tenKhachHangActionPerformed
@@ -763,15 +823,39 @@ public class DatBan_GUI extends javax.swing.JPanel {
 
     private void btn_thoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_thoatActionPerformed
         // TODO add your handling code here:
-        
-            mainGUI.jp_root_center.removeAll();
-            mainGUI.jp_root_center.add(danhSachBan_GUI);
-            mainGUI.jp_root_center.revalidate();
-            mainGUI.jp_root_center.repaint(); 
+
+        mainGUI.jp_root_center.removeAll();
+        mainGUI.jp_root_center.add(new DanhSachBan_GUI(mainGUI, this.danhSachBan_GUI.getDateDatBan()));
+        mainGUI.jp_root_center.revalidate();
+        mainGUI.jp_root_center.repaint();
     }//GEN-LAST:event_btn_thoatActionPerformed
 
     private void btn_huyBanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_huyBanActionPerformed
         // TODO add your handling code here:
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                "Nếu hủy bàn sẽ mất tiền đã cọc trước đó. Bạn có chắc chắn muốn hủy bàn không?",
+                "Xác nhận hủy",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (result == JOptionPane.YES_OPTION) {
+            // Xử lý hủy bàn ở đây
+            try {
+                HoaDonDAO.suaTrangThaiHoaDon(hoaDonThanhToan.getMaHoaDon(), EnumTrangThaiDatBan.DA_HUY);
+                JOptionPane.showMessageDialog(this, "Hủy bàn thành công!");
+                mainGUI.jp_root_center.removeAll();
+            mainGUI.jp_root_center.add(new DanhSachBan_GUI(mainGUI, this.danhSachBan_GUI.getDateDatBan()));
+            mainGUI.jp_root_center.revalidate();
+            mainGUI.jp_root_center.repaint();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Hủy bàn thất bại!");
+                System.out.println(e);
+            }
+        } else {
+            // Người dùng chọn "Không", không làm gì cả hoặc thông báo
+        }
+
     }//GEN-LAST:event_btn_huyBanActionPerformed
 
     private void btn_datBanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_datBanActionPerformed
@@ -787,6 +871,47 @@ public class DatBan_GUI extends javax.swing.JPanel {
         String email = txt_email.getText();
         String diaChi = txt_diaChi.getText();
         String maKH = UUID.randomUUID().toString(); // Giả sử hàm tạo mã KH ngẫu nhiên
+
+//        kiểm tra ngày đặt bàn trước giờ hiện tại thì báo lỗi
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime timeLimit = now.minus(15, ChronoUnit.MINUTES);
+        if (ngayDatBan.isBefore(timeLimit) && hoaDonThanhToan==null) {
+            JOptionPane.showMessageDialog(this, "Giờ đặt bàn không được trước thời gian hiện tại 15p. Vui lòng nhập lại");
+            return;
+        }
+        LocalDateTime timeLimit1 = now.minus(360, ChronoUnit.MINUTES);
+        if (ngayDatBan.isBefore(timeLimit1) && hoaDonThanhToan!=null) {
+            JOptionPane.showMessageDialog(this, "Không được thay đổi thông tin bàn trong khoảng 6 tiếng sát với giờ đặt bàn");
+            return;
+        }
+
+//        kiểm tra ngày các lần đặt trong ngày cách nhau 6 tiếng
+        if (hoaDonThanhToan != null) {
+            HoaDonDAO.suaTrangThaiHoaDon(hoaDonThanhToan.getMaHoaDon(), EnumTrangThaiDatBan.DA_HUY);
+        }
+        Date date1 = (Date) spinnerNgayGio.getValue();
+        LocalDateTime date1LocalDateTime = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        int hour = date1LocalDateTime.getHour();
+
+        if (hour < 6 || hour > 23) {
+            JOptionPane.showMessageDialog(this, "Thời gian nhà hàng phục vụ là 6AM - 11PM. Vui lòng chọn lại thời gian!");
+            return;
+        }
+        java.sql.Date sqlDate1 = new java.sql.Date(date1.getTime());
+        List<HoaDonThanhToan> listHoaDon = HoaDonDAO.getHoaDonTheoMaBanNgayTrangThai(banAn.getMaBan(), sqlDate1);
+
+        for (HoaDonThanhToan hd : listHoaDon) {
+                // Cùng ngày, kiểm tra khoảng cách giờ
+                long hoursDifference = Math.abs(ChronoUnit.HOURS.between(hd.getNgayDatBan(), date1LocalDateTime));
+
+                if (hoursDifference <= 6) {
+                    JOptionPane.showMessageDialog(this, "Đã có đơn đặt bàn gần với thời gian đặt bàn này trong vòng 6 tiếng, vui lòng nhập lại thời gian!");
+                    return;
+                }
+        }
+        if (hoaDonThanhToan != null) {
+            HoaDonDAO.suaTrangThaiHoaDon(hoaDonThanhToan.getMaHoaDon(), EnumTrangThaiDatBan.DA_DAT);
+        }
 
         // Kiểm tra tính hợp lệ của đầu vào
         if (!sdt.matches(PHONE_REGEX)) {
@@ -821,43 +946,123 @@ public class DatBan_GUI extends javax.swing.JPanel {
 
         // Mã hóa đơn
         String maHD = UUID.randomUUID().toString();
-        NhanVien nhanVien = NhanVienDAO.getAllNhanVien().get(0);
-        Date date1 = (Date) spinnerNgayGio.getValue();
-        LocalDateTime date = date1.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        Date date2 = (Date) spinnerNgayGio.getValue();
+        LocalDateTime date = date2.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
 
         // Tạo đối tượng HoaDonThanhToan
-        HoaDonThanhToan hoaDon = new HoaDonThanhToan(maHD, banAn, nhanVien, kh, ghiChu, tienCoc, date, EnumTrangThaiDatBan.DA_DAT, tienCoc, null);
+        HoaDonThanhToan hoaDon = new HoaDonThanhToan(maHD, banAn, nhanVien, kh, ghiChu, tienCoc, date, EnumTrangThaiDatBan.DA_DAT, TONG_TIEN, khuyenMai);
 
-        try {
-            HoaDonDAO.themHoaDon(hoaDon);
-        } catch (Exception e) {
-            System.out.println(e);
-            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi thêm hóa đơn.");
-            return;
-        }
+        if (hoaDonThanhToan == null) {
+            try {
+                HoaDonDAO.themHoaDon(hoaDon);
+                this.hoaDonThanhToan=hoaDon;
+            } catch (Exception e) {
+                System.out.println(e);
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi thêm hóa đơn.");
+                return;
+            }
 
-        // Thêm chi tiết hóa đơn cho từng món ăn
-        for (int i = 0; i < table_dsMonAn.getRowCount(); i++) {
-            String tenMon = table_dsMonAn.getValueAt(i, 0).toString();
-            int sl = Integer.parseInt(table_dsMonAn.getValueAt(i, 1).toString());
-            for (MonAn monan : listMonAn) {
-                if (monan.getTenMonAn().equals(tenMon)) {
-                    ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(UUID.randomUUID().toString(), hoaDon, monan, sl);
-                    try {
-                        ChiTietHoaDonDAO.themChiTietHoaDon(chiTietHoaDon);
-                    } catch (Exception e) {
-                        System.out.println(e);
-                        JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi thêm chi tiết hóa đơn.");
+            // Thêm chi tiết hóa đơn cho từng món ăn
+            for (int i = 0; i < table_dsMonAn.getRowCount(); i++) {
+                String tenMon = table_dsMonAn.getValueAt(i, 0).toString();
+                int sl = Integer.parseInt(table_dsMonAn.getValueAt(i, 1).toString());
+                for (MonAn monan : listMonAn) {
+                    if (monan.getTenMonAn().equals(tenMon)) {
+                        ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(UUID.randomUUID().toString(), hoaDon, monan, sl);
+                        try {
+                            ChiTietHoaDonDAO.themChiTietHoaDon(chiTietHoaDon);
+                        } catch (Exception e) {
+                            System.out.println(e);
+                            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi thêm chi tiết hóa đơn.");
+                        }
                     }
                 }
             }
-        }
-        JOptionPane.showMessageDialog(this, "Đặt bàn thành công!");
+            JOptionPane.showMessageDialog(this, "Đặt bàn thành công!");
+            btn_huyBan.setEnabled(true);
+            btn_thanhToan.setEnabled(true);
+        } else {
+            KhachHang kh1 = this.hoaDonThanhToan.getKhachHang();
+            kh1.setTenKhachHang(kh.getTenKhachHang());
+            kh1.setSoDienThoai(kh.getSoDienThoai());
+            kh1.setDiaChi(kh.getDiaChi());
+            kh1.setEmail(kh.getEmail());
+            KhachHangDao.suaKhachHang(kh1);
+            
+            HoaDonThanhToan hoaDon1 = this.hoaDonThanhToan;
+            hoaDon1.setBanAn(banAn);
+            hoaDon1.setNhanVien(nhanVien);
+            hoaDon1.setKhachHang(kh);
+            hoaDon1.setGhiChu(ghiChu);
+            hoaDon1.setNgayDatBan(ngayDatBan);
+            hoaDon1.setTrangThai(EnumTrangThaiDatBan.DA_DAT);
+            hoaDon1.setTongTien(TONG_TIEN);
+            hoaDon1.setKhuyenMai(null);
+            hoaDon1.setKhuyenMai(khuyenMai);
+            try {
+                HoaDonDAO.suaHoaDon(hoaDon1);
+                this.hoaDonThanhToan=hoaDon1;
 
+            } catch (Exception e) {
+                System.out.println(e);
+                JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật thông tin đặt bàn.");
+                return;
+            }
+
+            // Thêm chi tiết hóa đơn cho từng món ăn
+            ChiTietHoaDonDAO.xoaChiTietHoaDonTheoMaHoaDon(hoaDon1.getMaHoaDon());
+            for (int i = 0; i < table_dsMonAn.getRowCount(); i++) {
+                String tenMon = table_dsMonAn.getValueAt(i, 0).toString();
+                int sl = Integer.parseInt(table_dsMonAn.getValueAt(i, 1).toString());
+                for (MonAn monan : listMonAn) {
+                    if (monan.getTenMonAn().equals(tenMon)) {
+                        ChiTietHoaDon chiTietHoaDon = new ChiTietHoaDon(UUID.randomUUID().toString(), hoaDon1, monan, sl);
+                        try {
+                            ChiTietHoaDonDAO.themChiTietHoaDon(chiTietHoaDon);
+                        } catch (Exception e) {
+                            System.out.println(e);
+                            JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi cập nhật chi tiết hóa đơn.");
+                        }
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(this, "Cập nhật thông tin đặt bàn thành công!");
+
+        }
     }//GEN-LAST:event_btn_datBanActionPerformed
 
     private void btn_thanhToanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_thanhToanActionPerformed
         // TODO add your handling code here:
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                "Bạn có chắc chắn muốn thanh toán và trả bàn không?",
+                "Xác nhận thanh toán",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (result == JOptionPane.YES_OPTION) {
+            try {
+                HoaDonDAO.suaTrangThaiHoaDon(hoaDonThanhToan.getMaHoaDon(), EnumTrangThaiDatBan.DA_THANH_TOAN);
+                int result1 = JOptionPane.showConfirmDialog(
+                null,
+                "Thanh toán thành công, bạn có muốn xuất hóa đơn không?",
+                "Xác nhận thanh toán",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+                if(result1 == JOptionPane.YES_OPTION){
+                    HoaDonPDFExporter.xuatHoaDonPDF(hoaDonThanhToan);
+                }
+                mainGUI.jp_root_center.removeAll();
+                mainGUI.jp_root_center.add(new DanhSachBan_GUI(mainGUI, this.danhSachBan_GUI.getDateDatBan()));
+                mainGUI.jp_root_center.revalidate();
+                mainGUI.jp_root_center.repaint();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Thanh toán thất bại!");
+                System.out.println(e);
+            }
+        } else {
+            // Người dùng chọn "Không", không làm gì cả hoặc thông báo
+        }
     }//GEN-LAST:event_btn_thanhToanActionPerformed
 
 
@@ -871,7 +1076,6 @@ public class DatBan_GUI extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
@@ -894,6 +1098,7 @@ public class DatBan_GUI extends javax.swing.JPanel {
     private javax.swing.JPanel jp_thongTinMonAnRoot;
     private javax.swing.JLabel label_khuyenMai;
     private javax.swing.JLabel label_tenBan;
+    private javax.swing.JLabel label_tenKM;
     private javax.swing.JLabel label_thanhTien;
     private javax.swing.JLabel label_tongThanhToan;
     private javax.swing.JLabel label_vat;

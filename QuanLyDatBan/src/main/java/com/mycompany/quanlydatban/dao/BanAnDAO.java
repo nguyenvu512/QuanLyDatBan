@@ -28,7 +28,9 @@ public class BanAnDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            ps = con.prepareStatement("SELECT * FROM BanAn\n" + "ORDER BY CAST(SUBSTRING(maBan, 5, LEN(maBan) - 4) AS INT);");
+            ps = con.prepareStatement("SELECT * FROM BanAn " +
+                          "WHERE hoatDong = 1 " +
+                          "ORDER BY CAST(SUBSTRING(maBan, 5, LEN(maBan) - 4) AS INT);");
             rs = ps.executeQuery();
             while (rs.next()) {
                 String maBan = rs.getString(1);
@@ -51,11 +53,12 @@ public class BanAnDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("INSERT INTO BanAn VALUES (?,?,?,?)");
+            ps = con.prepareStatement("INSERT INTO BanAn VALUES (?,?,?,?,?)");
             ps.setString(1, ban.getMaBan());
             ps.setInt(2, ban.getSoLuongGhe());
             ps.setString(3, ban.getTrangThai().toString());
             ps.setString(4, ban.getGhiChu());
+            ps.setBoolean(5, true);
             n = ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -99,7 +102,7 @@ public class BanAnDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("DELETE FROM BanAn WHERE maBan=?");
+            ps = con.prepareStatement("update BanAn set hoatDong = 0 where maBan = ?");
             ps.setString(1, maBan);
             n = ps.executeUpdate();
         } catch (SQLException ex) {

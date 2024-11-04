@@ -8,6 +8,7 @@ import com.mycompany.quanlydatban.dao.BanAnDAO;
 import com.mycompany.quanlydatban.dao.HoaDonDAO;
 import com.mycompany.quanlydatban.dao.MonAnDAO;
 import com.mycompany.quanlydatban.entity.BanAn;
+import com.mycompany.quanlydatban.entity.EnumTrangThaiDatBan;
 import com.mycompany.quanlydatban.entity.HoaDonThanhToan;
 import com.mycompany.quanlydatban.entity.MonAn;
 import com.toedter.calendar.JDateChooser;
@@ -19,6 +20,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -30,11 +33,15 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 /**
  *
  * @author ACER
  */
+@Data
+@AllArgsConstructor
 public class DanhSachBan_GUI extends javax.swing.JPanel {
 
     /**
@@ -49,20 +56,33 @@ public class DanhSachBan_GUI extends javax.swing.JPanel {
     JDateChooser dateChooser = new JDateChooser();
     java.sql.Date dateDatBan;
 
-    public DanhSachBan_GUI(MainGUI mainGUI) {
-        dateChooser.setDate(new Date());
-        dateDatBan = new java.sql.Date(dateChooser.getDate().getTime());
+    public DanhSachBan_GUI(MainGUI mainGUI, java.sql.Date dateDatBan) {
         initComponents();
+        this.dateDatBan=dateDatBan;
+        dateChooser.setDate(this.dateDatBan);
         setLayout(new BorderLayout());
         main.setLayout(new GridLayout(0, 5, 10, 10)); // 5 cột, khoảng cách giữa các bàn là 10px
         main.setBackground(Color.WHITE);
 
         dsBanAn = BanAnDAO.getAllBan();
+        
+        for(BanAn banan : dsBanAn){
+            List<HoaDonThanhToan> dsHoaDon1 = HoaDonDAO.getHoaDonTheoMaBanVaNgay(banan.getMaBan(), this.dateDatBan);
+                        
+//            nếu quá 6 tiếng thì tự động hủy bàn
+            for(HoaDonThanhToan hd:dsHoaDon1){
+                LocalDateTime ngayDatBan = hd.getNgayDatBan(); // Lấy ngày đặt bàn
+                LocalDateTime ngayHienTai = LocalDateTime.now(); // Lấy ngày hiện tại
+                
+                if (ngayHienTai.isAfter(ngayDatBan.plusHours(1))) {
+                    HoaDonDAO.suaTrangThaiHoaDon(hd.getMaHoaDon(), EnumTrangThaiDatBan.DA_HUY);
+                }
+            }
+        }
 
         // Tạo và thêm icon cho mỗi bàn vào panel
         for (BanAn banAn : dsBanAn) {
-            List<HoaDonThanhToan> dsHoaDon = HoaDonDAO.getHoaDonTheoMaBanVaNgay(banAn.getMaBan(), dateDatBan);
-
+            List<HoaDonThanhToan> dsHoaDon = HoaDonDAO.getHoaDonTheoMaBanNgayTrangThai(banAn.getMaBan(), this.dateDatBan);
             JButton banButton = new JButton("<html><div style='text-align: center;'>"
                     + banAn.getMaBan() + "<br>("
                     + "Số lượng ghế: " + banAn.getSoLuongGhe() + ")</div></html>");
@@ -86,7 +106,7 @@ public class DanhSachBan_GUI extends javax.swing.JPanel {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         mainGUI.getJp_root_center().removeAll();
-                        mainGUI.getJp_root_center().add(new DatBan_GUI(banAn, null, mainGUI, DanhSachBan_GUI.this));
+                        mainGUI.getJp_root_center().add(new DatBan_GUI(banAn, null, mainGUI, DanhSachBan_GUI.this, dateDatBan.toLocalDate().atStartOfDay()));
                         mainGUI.getJp_root_center().revalidate();
                         mainGUI.getJp_root_center().repaint();
 
@@ -96,7 +116,7 @@ public class DanhSachBan_GUI extends javax.swing.JPanel {
                  banButton.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        new DanhSachDatBanGUI(mainGUI, dsHoaDon, DanhSachBan_GUI.this);
+                        new DanhSachDatBanGUI(banAn, mainGUI, dsHoaDon, DanhSachBan_GUI.this);
                     }
                 });
             }
@@ -132,56 +152,12 @@ public class DanhSachBan_GUI extends javax.swing.JPanel {
         dateChooser.getDateEditor().addPropertyChangeListener("date", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                dateDatBan = new java.sql.Date(dateChooser.getDate().getTime());
-                main.removeAll();
+                java.sql.Date dateDatBan1 = new java.sql.Date(dateChooser.getDate().getTime());
+                mainGUI.jp_root_center.removeAll();
                 // Tạo và thêm icon cho mỗi bàn vào panel
-                for (BanAn banAn : dsBanAn) {
-                    List<HoaDonThanhToan> dsHoaDon = HoaDonDAO.getHoaDonTheoMaBanVaNgay(banAn.getMaBan(), dateDatBan);
-
-                    JButton banButton = new JButton("<html><div style='text-align: center;'>"
-                            + banAn.getMaBan() + "<br>("
-                            + "Số lượng ghế: " + banAn.getSoLuongGhe() + ")</div></html>");
-                    banButton.setIcon(new ImageIcon("D:\\PTUD\\QuanLyDatBan\\QuanLyDatBan\\QuanLyDatBan\\icon\\ban.png"));
-
-                    if (dsHoaDon.size() == 0) {
-                        banButton.setBackground(emptyColor);
-                    } else {
-                        banButton.setBackground(orderedColor);
-                    }
-                    banButton.setOpaque(true); // Bắt buộc để màu nền có hiệu lực
-                    banButton.setFocusPainted(false); // Tắt hiệu ứng focus
-                    banButton.setFont(new java.awt.Font("JetBrains Mono NL ExtraBold", 0, 14)); // NOI18N
-
-                    // Đặt chữ ở dưới icon
-                    banButton.setVerticalTextPosition(SwingConstants.BOTTOM);
-                    banButton.setHorizontalTextPosition(SwingConstants.CENTER);
-
-                    if (dsHoaDon.size() == 0) {
-                        banButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                mainGUI.getJp_root_center().removeAll();
-                                mainGUI.getJp_root_center().add(new DatBan_GUI(banAn, null, mainGUI, DanhSachBan_GUI.this));
-                                mainGUI.getJp_root_center().revalidate();
-                                mainGUI.getJp_root_center().repaint();
-
-                            }
-                        });
-                    } else {
-                        banButton.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                new DanhSachDatBanGUI(mainGUI, dsHoaDon, DanhSachBan_GUI.this);
-
-                            }
-                        });
-                    }
-
-                    main.add(banButton);  // Thêm nút bàn vào panel
-                    main.revalidate();
-                    main.repaint();
-                }
-
+                mainGUI.jp_root_center.add(new DanhSachBan_GUI(mainGUI,dateDatBan1));
+                mainGUI.jp_root_center.revalidate();
+                mainGUI.jp_root_center.repaint();
             }
         });
         jp_ktNgayDat.setLayout(new BorderLayout());

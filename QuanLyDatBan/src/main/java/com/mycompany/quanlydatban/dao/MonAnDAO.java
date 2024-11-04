@@ -24,7 +24,7 @@ public class MonAnDAO {
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            ps = con.prepareStatement("SELECT * FROM MonAn");
+            ps = con.prepareStatement("SELECT * FROM MonAn where hoatDong = 1");
             rs = ps.executeQuery();
             while (rs.next()) {
                 String maF = rs.getString(1);
@@ -47,13 +47,14 @@ public class MonAnDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("INSERT INTO MonAn VALUES(?,?,?,?,?,?)");
+            ps = con.prepareStatement("INSERT INTO MonAn VALUES(?,?,?,?,?,?,?)");
             ps.setString(1, f.getMaMonAn());
             ps.setString(2, f.getTenMonAn());
             ps.setDouble(3, f.getGiaTien());
             ps.setString(4, f.getMoTa());
             ps.setString(5, f.getHinhAnh());
             ps.setString(6, f.getDanhMuc().getMaDanhMuc());
+            ps.setBoolean(7, true);
             n = ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -99,7 +100,7 @@ public class MonAnDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("DELETE FROM MonAn WHERE maMonAn=?");
+            ps = con.prepareStatement("update MonAn set hoatDong = 0 where maMonAn = ?");
             ps.setString(1, maF);
             n = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -121,7 +122,7 @@ public class MonAnDAO {
         ResultSet rs=null;
         MonAn f = null;
         try {
-            ps = con.prepareStatement("SELECT * FROM MonAn WHERE maMonAn=?");
+            ps = con.prepareStatement("SELECT * FROM MonAn WHERE maMonAn=? and hoatDong = 1");
             ps.setString(1, maF);
             rs = ps.executeQuery();
             while(rs.next()){
@@ -152,22 +153,22 @@ public class MonAnDAO {
         return f;
     }
     
-    public static MonAn timMonAnByTenMon(String maF){
+    public  MonAn timMonAnByTenMon(String tenF){
         java.sql.Connection con = Connection.getConnection();
         PreparedStatement ps = null;
         ResultSet rs=null;
         MonAn f = null;
         try {
-            ps = con.prepareStatement("SELECT * FROM MonAn WHERE tenMonAn=?");
-            ps.setString(1, maF);
+            ps = con.prepareStatement("SELECT * FROM MonAn WHERE tenMonAn=? and hoatDong = 1");
+            ps.setString(1, tenF);
             rs = ps.executeQuery();
             while(rs.next()){
-                String tenMonAn= rs.getString(2);
+                String maMonAn= rs.getString(1);
                 double gia = rs.getDouble(3);
                 String moTa = rs.getString(4);
                 String hinhAnh = rs.getString(5);
                 DanhMucMonAn danhMuc = DanhMucMonAnDAO.getByMaDanhMuc(rs.getString(6));
-                f = new MonAn(maF, tenMonAn, gia, moTa, hinhAnh, danhMuc);
+                f = new MonAn(maMonAn, tenF, gia, moTa, hinhAnh, danhMuc);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

@@ -25,4 +25,14 @@ public class BanAn {
     int soLuongGhe;
     EnumTrangThaiBan trangThai;
     String ghiChu;
+    boolean hoatDong;
+
+    public BanAn(String maBan, int soLuongGhe, EnumTrangThaiBan trangThai, String ghiChu) {
+        this.maBan = maBan;
+        this.soLuongGhe = soLuongGhe;
+        this.trangThai = trangThai;
+        this.ghiChu = ghiChu;
+    }
+    
+    
 }

@@ -24,4 +24,5 @@ public class TaiKhoan {
     String tenDangNhap;
     String matKhau;
     NhanVien nhanVien;
+    Boolean hoatDong;
 }

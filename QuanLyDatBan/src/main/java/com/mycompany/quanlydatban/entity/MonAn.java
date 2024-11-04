@@ -27,4 +27,16 @@ public class MonAn {
     String moTa;
     String hinhAnh;
     DanhMucMonAn danhMuc;
+    boolean hoatDong;
+
+    public MonAn(String maMonAn, String tenMonAn, double giaTien, String moTa, String hinhAnh, DanhMucMonAn danhMuc) {
+        this.maMonAn = maMonAn;
+        this.tenMonAn = tenMonAn;
+        this.giaTien = giaTien;
+        this.moTa = moTa;
+        this.hinhAnh = hinhAnh;
+        this.danhMuc = danhMuc;
+    }
+    
+    
 }

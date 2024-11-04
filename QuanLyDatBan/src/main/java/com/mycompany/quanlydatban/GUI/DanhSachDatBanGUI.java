@@ -4,6 +4,7 @@
  */
 package com.mycompany.quanlydatban.GUI;
 
+import com.mycompany.quanlydatban.entity.BanAn;
 import com.mycompany.quanlydatban.entity.HoaDonThanhToan;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -11,6 +12,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import javax.swing.JDialog;
@@ -36,10 +38,12 @@ public class DanhSachDatBanGUI extends JDialog {
     Color color_bg = Color.decode("#00405d");
     List<HoaDonThanhToan> dsHoaDon;
     DanhSachBan_GUI danhSachBan_GUI;
+    BanAn banAn;
     
-    public DanhSachDatBanGUI(MainGUI mainGUI, List<HoaDonThanhToan> dsHoaDon, DanhSachBan_GUI danhSachBan_GUI) {
+    public DanhSachDatBanGUI(BanAn banAn, MainGUI mainGUI, List<HoaDonThanhToan> dsHoaDon, DanhSachBan_GUI danhSachBan_GUI) {
         super(mainGUI, true);
         this.dsHoaDon=dsHoaDon;
+        this.banAn=banAn;
         this.danhSachBan_GUI=danhSachBan_GUI;
         initComponents();
         this.mainGUI = mainGUI;
@@ -85,7 +89,7 @@ public class DanhSachDatBanGUI extends JDialog {
                     dispose();
                     mainGUI.requestFocusInWindow();
                     mainGUI.jp_root_center.removeAll();
-                    mainGUI.jp_root_center.add(new DatBan_GUI(selectedHoaDon.getBanAn(), selectedHoaDon, mainGUI, danhSachBan_GUI));
+                    mainGUI.jp_root_center.add(new DatBan_GUI(selectedHoaDon.getBanAn(), selectedHoaDon, mainGUI, danhSachBan_GUI, null));
                     mainGUI.jp_root_center.revalidate();
                     mainGUI.jp_root_center.repaint();
                 }
@@ -160,6 +164,11 @@ public class DanhSachDatBanGUI extends JDialog {
 
         btn_DatBanMoi.setForeground(new java.awt.Color(255, 255, 255));
         btn_DatBanMoi.setText("Đặt bàn mới");
+        btn_DatBanMoi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_DatBanMoiActionPerformed(evt);
+            }
+        });
         jp_button.add(btn_DatBanMoi);
 
         btn_thoat.setForeground(new java.awt.Color(255, 255, 255));
@@ -177,19 +186,22 @@ public class DanhSachDatBanGUI extends JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        this.dispose();
-        mainGUI.requestFocusInWindow();
-        mainGUI.jp_root_center.removeAll();
-//        mainGUI.jp_root_center.add();
-        mainGUI.jp_root_center.revalidate();
-        mainGUI.jp_root_center.repaint();
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void btn_thoatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_thoatActionPerformed
         // TODO add your handling code here:
+        this.dispose();
     }//GEN-LAST:event_btn_thoatActionPerformed
+
+    private void btn_DatBanMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_DatBanMoiActionPerformed
+        // TODO add your handling code here:
+         this.dispose();
+        mainGUI.jp_root_center.removeAll();
+        mainGUI.jp_root_center.add(new DatBan_GUI(banAn, null, mainGUI, danhSachBan_GUI, danhSachBan_GUI.getDateDatBan().toLocalDate().atStartOfDay()));
+        mainGUI.jp_root_center.revalidate();
+        mainGUI.jp_root_center.repaint();
+    }//GEN-LAST:event_btn_DatBanMoiActionPerformed
 
     /**
      * @param args the command line arguments

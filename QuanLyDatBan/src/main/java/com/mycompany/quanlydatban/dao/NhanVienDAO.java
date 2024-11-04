@@ -25,7 +25,7 @@ public class NhanVienDAO {
         try {
             java.sql.Connection con = Connection.getConnection();
             PreparedStatement ps = null;
-            ps = con.prepareStatement("SELECT * FROM NhanVien");
+            ps = con.prepareStatement("SELECT * FROM NhanVien where hoatDong = 1");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String maNV = rs.getString(1);
@@ -51,7 +51,7 @@ public class NhanVienDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("INSERT INTO NhanVien VALUES(?,?,?,?,?,?,?,?)");
+            ps = con.prepareStatement("INSERT INTO NhanVien VALUES(?,?,?,?,?,?,?,?,?)");
             ps.setString(1, nv.getMaNhanVien());
             ps.setString(2, nv.getTenNhanVien());
             ps.setString(3, nv.getEmail());
@@ -60,6 +60,7 @@ public class NhanVienDAO {
             ps.setBoolean(6, nv.getGioiTinh());
             ps.setString(7, nv.getNgaySinh().toString());
             ps.setString(8, nv.getChucVu().toString());
+            ps.setBoolean(9, true);
             n = ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -79,7 +80,7 @@ public class NhanVienDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("UPDATE NhanVien SET tenNhanVien=?, email=?, soDienThoai=?, diaChi=?, gt=?, ngaySinh=?, chucVu=? WHERE maNhanVien=?");
+            ps = con.prepareStatement("UPDATE NhanVien SET tenNhanVien=?, email=?, soDienThoai=?, diaChi=?, gioiTinh=?, ngaySinh=?, chucVu=? WHERE maNhanVien=?");
             ps.setString(8, nv.getMaNhanVien());
             ps.setString(1, nv.getTenNhanVien());
             ps.setString(2, nv.getEmail());
@@ -107,7 +108,7 @@ public class NhanVienDAO {
         PreparedStatement ps = null;
         int n = 0;
         try {
-            ps = con.prepareStatement("DELETE FROM NhanVien WHERE maNV=?");
+            ps = con.prepareStatement("update NhanVien set hoatDong = 0 where maNhanVien = ?");
             ps.setString(1, maNV);
             n = ps.executeUpdate();
         } catch (SQLException ex) {
@@ -129,7 +130,7 @@ public class NhanVienDAO {
         ResultSet rs = null;
         NhanVien nv = null;
         try {
-            ps = con.prepareStatement("SELECT * FROM NhanVien WHERE maNhanVien=?");
+            ps = con.prepareStatement("SELECT * FROM NhanVien WHERE maNhanVien=? and hoatDong = 1");
             ps.setString(1, maNV);
             rs = ps.executeQuery();
             while (rs.next()) {

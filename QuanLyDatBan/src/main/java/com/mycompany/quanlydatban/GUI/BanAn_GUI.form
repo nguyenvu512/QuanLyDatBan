@@ -173,6 +173,9 @@
                   <Dimension value="[100, 50]"/>
                 </Property>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jb_xoaActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="jb_them">
               <Properties>
@@ -265,7 +268,7 @@
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
               <Group type="102" attributes="0">
-                  <Component id="jt_tim" min="-2" pref="183" max="-2" attributes="0"/>
+                  <Component id="txt_tim" min="-2" pref="183" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="jb_tim" min="-2" pref="82" max="-2" attributes="0"/>
                   <EmptySpace pref="915" max="32767" attributes="0"/>
@@ -277,7 +280,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="15" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
-                      <Component id="jt_tim" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Component id="txt_tim" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
                       <Component id="jb_tim" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="390" max="-2" attributes="0"/>
@@ -286,7 +289,7 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JTextField" name="jt_tim">
+        <Component class="javax.swing.JTextField" name="txt_tim">
           <Properties>
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="JetBrains Mono" size="12" style="0"/>

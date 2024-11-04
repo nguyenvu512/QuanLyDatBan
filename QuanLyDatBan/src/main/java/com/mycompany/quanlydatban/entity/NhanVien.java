@@ -29,4 +29,18 @@ public class NhanVien {
     Boolean gioiTinh;
     LocalDate ngaySinh;
     EnumChucVu chucVu;
+    boolean hoatDong;
+
+    public NhanVien(String maNhanVien, String tenNhanVien, String email, String soDienThoai, String diaChi, Boolean gioiTinh, LocalDate ngaySinh, EnumChucVu chucVu) {
+        this.maNhanVien = maNhanVien;
+        this.tenNhanVien = tenNhanVien;
+        this.email = email;
+        this.soDienThoai = soDienThoai;
+        this.diaChi = diaChi;
+        this.gioiTinh = gioiTinh;
+        this.ngaySinh = ngaySinh;
+        this.chucVu = chucVu;
+    }
+    
+    
 }

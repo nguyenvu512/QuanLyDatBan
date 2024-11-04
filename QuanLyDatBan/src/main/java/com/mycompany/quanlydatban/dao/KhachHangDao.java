@@ -18,7 +18,7 @@ import java.util.List;
  * @author ACER
  */
 public class KhachHangDao {
-    
+
     public static List<KhachHang> getAllKhachHang() {
         List<KhachHang> dsF = new ArrayList<>();
         java.sql.Connection con = Connection.getConnection();
@@ -41,7 +41,7 @@ public class KhachHangDao {
         }
         return dsF;
     }
-    
+
     public static boolean themKhachHang(KhachHang f) {
         java.sql.Connection con = Connection.getConnection();
         PreparedStatement ps = null;
@@ -66,43 +66,69 @@ public class KhachHangDao {
         }
         return n > 0;
     }
-    public static KhachHang timKhachHangTheoMa(String maBan) {
-    KhachHang danhSachKhachHang=null;
-    java.sql.Connection con = Connection.getConnection();
-    PreparedStatement ps = null;
-    ResultSet rs = null;
 
-    try {
-        String sql = "SELECT * FROM KhachHang WHERE maKhachHang = ?";
-        ps = con.prepareStatement(sql);
-        ps.setString(1, maBan);
-        rs = ps.executeQuery();
+    public static boolean suaKhachHang(KhachHang f) {
+        String sql = "UPDATE KhachHang SET tenKhachHang = ?, email = ?, soDienThoai = ?, diaChi = ? WHERE maKhachHang = ?";
+        int n = 0;
 
-        while (rs.next()) {
-            KhachHang khachHang = new KhachHang();
-            khachHang.setMaKhachHang(rs.getString("maKhachHang"));
-            khachHang.setTenKhachHang(rs.getString("tenKhachHang"));
-            khachHang.setEmail(rs.getString("email"));
-            khachHang.setSoDienThoai(rs.getString("soDienThoai"));
-            khachHang.setDiaChi(rs.getString("diaChi"));
-            // Thêm các thuộc tính khác nếu cần
-            
-            danhSachKhachHang=khachHang;
-        }
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-    } finally {
-        // Đóng ResultSet và PreparedStatement
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
+        try (java.sql.Connection con = Connection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, f.getTenKhachHang());
+            ps.setString(2, f.getEmail());
+            ps.setString(3, f.getSoDienThoai());
+            ps.setString(4, f.getDiaChi());
+
+            // Điều kiện WHERE để xác định khách hàng cần cập nhật
+            ps.setString(5, f.getMaKhachHang());
+
+            n = ps.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        // Đóng kết nối
-        Connection.closeConnection(con);
+        return n > 0;
     }
-    return danhSachKhachHang;
-}
+
+    public static KhachHang timKhachHangTheoMa(String maBan) {
+        KhachHang danhSachKhachHang = null;
+        java.sql.Connection con = Connection.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            String sql = "SELECT * FROM KhachHang WHERE maKhachHang = ?";
+            ps = con.prepareStatement(sql);
+            ps.setString(1, maBan);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                KhachHang khachHang = new KhachHang();
+                khachHang.setMaKhachHang(rs.getString("maKhachHang"));
+                khachHang.setTenKhachHang(rs.getString("tenKhachHang"));
+                khachHang.setEmail(rs.getString("email"));
+                khachHang.setSoDienThoai(rs.getString("soDienThoai"));
+                khachHang.setDiaChi(rs.getString("diaChi"));
+                // Thêm các thuộc tính khác nếu cần
+
+                danhSachKhachHang = khachHang;
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            // Đóng ResultSet và PreparedStatement
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (ps != null) {
+                    ps.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            // Đóng kết nối
+            Connection.closeConnection(con);
+        }
+        return danhSachKhachHang;
+    }
 
 }

@@ -4,6 +4,8 @@
  */
 package com.mycompany.quanlydatban.GUI;
 
+import com.mycompany.quanlydatban.entity.EnumChucVu;
+import com.mycompany.quanlydatban.entity.NhanVien;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -13,10 +15,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
@@ -34,16 +39,25 @@ public class MainGUI extends javax.swing.JFrame {
     private int currentIndex;
     Color color_bg = Color.decode("#00405d");
     Color selectedColor = Color.decode("#3f729b");
+    NhanVien nhanVien;
 
-    public MainGUI() {
+    public MainGUI(NhanVien nhanVien) {
         initComponents();
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
         setVisible(true);
         setLayout(new BorderLayout());
         add(jp_root, BorderLayout.CENTER);
         add(jp_menu, BorderLayout.WEST);
-
-        labelTenNV.setText("<html><center>Xin chào, Võ Huy Tưởng<br><font size='4'>Nhân viên</font></center></html>");
+        
+        this.nhanVien=nhanVien;
+        
+        String chucvu;
+        if(nhanVien.getChucVu().toString().equals("NHAN_VIEN")){
+            chucvu = "Nhân viên";
+        }else{
+            chucvu = "Quản lý";
+        }
+        labelTenNV.setText("<html><center>Xin chào, " + nhanVien.getTenNhanVien() + "<br><font size='4'>"  + chucvu + "</font></center></html>");
         labelTenNV.setHorizontalAlignment(SwingConstants.CENTER); // Căn giữa nội dung trong label
 
         jp_root.setLayout(new BorderLayout());
@@ -65,7 +79,7 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_DatBan.setBackground(color_bg);
         menuItem_HoaDon.setBackground(color_bg);
         menuItem_MonAn.setBackground(color_bg);
-        menuItem_KhachHang.setBackground(color_bg);
+        menuItem_khuyenMai.setBackground(color_bg);
         menuItem_NhanVien.setBackground(color_bg);
         menuItem_ThongKe.setBackground(color_bg);
 
@@ -75,7 +89,7 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_DatBan.setBorder(new EmptyBorder(0, 80, 0, 0));
         menuItem_HoaDon.setBorder(new EmptyBorder(0, 80, 0, 0));
         menuItem_MonAn.setBorder(new EmptyBorder(0, 80, 0, 0));
-        menuItem_KhachHang.setBorder(new EmptyBorder(0, 80, 0, 0));
+        menuItem_khuyenMai.setBorder(new EmptyBorder(0, 80, 0, 0));
         menuItem_NhanVien.setBorder(new EmptyBorder(0, 80, 0, 0));
         menuItem_ThongKe.setBorder(new EmptyBorder(0, 80, 0, 0));
 
@@ -85,7 +99,7 @@ public class MainGUI extends javax.swing.JFrame {
         addButtonListeners(menuItem_DatBan);
         addButtonListeners(menuItem_HoaDon);
         addButtonListeners(menuItem_MonAn);
-        addButtonListeners(menuItem_KhachHang);
+        addButtonListeners(menuItem_khuyenMai);
         addButtonListeners(menuItem_TaiKhoan);
         addButtonListeners(menuItem_NhanVien);
         addButtonListeners(menuItem_ThongKe);
@@ -189,7 +203,7 @@ public class MainGUI extends javax.swing.JFrame {
 
 // Hàm hủy chọn tất cả các nút
     private void deselectAllButtons() {
-        JButton[] buttons = {menuItem_BanAn, menuItem_DatBan, menuItem_HoaDon, menuItem_MonAn, menuItem_KhachHang, menuItem_TaiKhoan, menuItem_NhanVien, menuItem_ThongKe};
+        JButton[] buttons = {menuItem_BanAn, menuItem_DatBan, menuItem_HoaDon, menuItem_MonAn, menuItem_khuyenMai, menuItem_TaiKhoan, menuItem_NhanVien, menuItem_ThongKe};
         for (JButton btn : buttons) {
             btn.getModel().setSelected(false);
             btn.setBackground(color_bg);  // Đặt lại màu nền mặc định
@@ -214,7 +228,7 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_DatBan = new javax.swing.JButton();
         menuItem_HoaDon = new javax.swing.JButton();
         menuItem_MonAn = new javax.swing.JButton();
-        menuItem_KhachHang = new javax.swing.JButton();
+        menuItem_khuyenMai = new javax.swing.JButton();
         menuItem_NhanVien = new javax.swing.JButton();
         menuItem_ThongKe = new javax.swing.JButton();
         jp_root = new javax.swing.JPanel();
@@ -237,7 +251,6 @@ public class MainGUI extends javax.swing.JFrame {
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(1280, 720));
         getContentPane().setLayout(null);
 
         jp_menu.setBackground(new java.awt.Color(255, 255, 255));
@@ -345,20 +358,20 @@ public class MainGUI extends javax.swing.JFrame {
         });
         jp_menu.add(menuItem_MonAn, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 340, 260, 50));
 
-        menuItem_KhachHang.setFont(new java.awt.Font("JetBrains Mono Medium", 1, 18)); // NOI18N
-        menuItem_KhachHang.setForeground(new java.awt.Color(255, 255, 255));
-        menuItem_KhachHang.setText("Khách Hàng");
-        menuItem_KhachHang.setBorder(null);
-        menuItem_KhachHang.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        menuItem_KhachHang.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
-        menuItem_KhachHang.setIconTextGap(30);
-        menuItem_KhachHang.setPreferredSize(new java.awt.Dimension(72, 30));
-        menuItem_KhachHang.addActionListener(new java.awt.event.ActionListener() {
+        menuItem_khuyenMai.setFont(new java.awt.Font("JetBrains Mono Medium", 1, 18)); // NOI18N
+        menuItem_khuyenMai.setForeground(new java.awt.Color(255, 255, 255));
+        menuItem_khuyenMai.setText("Khuyến Mãi");
+        menuItem_khuyenMai.setBorder(null);
+        menuItem_khuyenMai.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        menuItem_khuyenMai.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        menuItem_khuyenMai.setIconTextGap(30);
+        menuItem_khuyenMai.setPreferredSize(new java.awt.Dimension(72, 30));
+        menuItem_khuyenMai.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItem_KhachHangActionPerformed(evt);
+                menuItem_khuyenMaiActionPerformed(evt);
             }
         });
-        jp_menu.add(menuItem_KhachHang, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 260, 50));
+        jp_menu.add(menuItem_khuyenMai, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 260, 50));
 
         menuItem_NhanVien.setFont(new java.awt.Font("JetBrains Mono Medium", 1, 18)); // NOI18N
         menuItem_NhanVien.setForeground(new java.awt.Color(255, 255, 255));
@@ -368,6 +381,11 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_NhanVien.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         menuItem_NhanVien.setIconTextGap(30);
         menuItem_NhanVien.setPreferredSize(new java.awt.Dimension(72, 30));
+        menuItem_NhanVien.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_NhanVienActionPerformed(evt);
+            }
+        });
         jp_menu.add(menuItem_NhanVien, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 440, 260, 50));
 
         menuItem_ThongKe.setFont(new java.awt.Font("JetBrains Mono Medium", 1, 18)); // NOI18N
@@ -378,6 +396,11 @@ public class MainGUI extends javax.swing.JFrame {
         menuItem_ThongKe.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
         menuItem_ThongKe.setIconTextGap(30);
         menuItem_ThongKe.setPreferredSize(new java.awt.Dimension(72, 30));
+        menuItem_ThongKe.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItem_ThongKeActionPerformed(evt);
+            }
+        });
         jp_menu.add(menuItem_ThongKe, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 490, 260, 50));
 
         getContentPane().add(jp_menu);
@@ -474,19 +497,31 @@ public class MainGUI extends javax.swing.JFrame {
 
     private void menuItem_HoaDonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_HoaDonActionPerformed
         // TODO add your handling code here:
+        jp_root_center.removeAll();
+        jp_root_center.add(new HoaDonPanel());
+        jp_root_center.revalidate();
+        jp_root_center.repaint();    
     }//GEN-LAST:event_menuItem_HoaDonActionPerformed
 
     private void menuItem_DatBanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_DatBanActionPerformed
         // TODO add your handling code here:
         jp_root_center.removeAll();
-        jp_root_center.add(new DanhSachBan_GUI(this), BorderLayout.CENTER);
+        jp_root_center.add(new DanhSachBan_GUI(this, Date.valueOf(LocalDate.now())), BorderLayout.CENTER);
         jp_root_center.revalidate();
         jp_root_center.repaint();        // TODO add your handling code here:
     }//GEN-LAST:event_menuItem_DatBanActionPerformed
 
-    private void menuItem_KhachHangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_KhachHangActionPerformed
+    private void menuItem_khuyenMaiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_khuyenMaiActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_menuItem_KhachHangActionPerformed
+        if(nhanVien.getChucVu().toString().equals(EnumChucVu.QUAN_LY.toString())){
+            jp_root_center.removeAll();
+            jp_root_center.add(new KhuyenMai_GUI());
+            jp_root_center.revalidate();
+            jp_root_center.repaint(); 
+        }else{
+            JOptionPane.showMessageDialog(this, "Chức năng này chỉ dành cho quản lý!");
+        }
+    }//GEN-LAST:event_menuItem_khuyenMaiActionPerformed
 
     private void menuItem_MonAnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_MonAnActionPerformed
         jp_root_center.removeAll();
@@ -501,7 +536,32 @@ public class MainGUI extends javax.swing.JFrame {
 
     private void menuItem_TaiKhoanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_TaiKhoanActionPerformed
         // TODO add your handling code here:
+        new TaiKhoanGUI(this, rootPaneCheckingEnabled, nhanVien, this);
     }//GEN-LAST:event_menuItem_TaiKhoanActionPerformed
+
+    private void menuItem_NhanVienActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_NhanVienActionPerformed
+        // TODO add your handling code here:
+        if(nhanVien.getChucVu().toString().equals(EnumChucVu.QUAN_LY.toString())){
+            jp_root_center.removeAll();
+            jp_root_center.add(new NhanVienGUI());
+            jp_root_center.revalidate();
+            jp_root_center.repaint(); 
+        }else{
+            JOptionPane.showMessageDialog(this, "Chức năng này chỉ dành cho quản lý!");
+        }
+    }//GEN-LAST:event_menuItem_NhanVienActionPerformed
+
+    private void menuItem_ThongKeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItem_ThongKeActionPerformed
+        // TODO add your handling code here:
+        if(nhanVien.getChucVu().toString().equals(EnumChucVu.QUAN_LY.toString())){
+            jp_root_center.removeAll();
+            jp_root_center.add(new ThongKe_GUI());
+            jp_root_center.revalidate();
+            jp_root_center.repaint(); 
+        }else{
+            JOptionPane.showMessageDialog(this, "Chức năng này chỉ dành cho quản lý!");
+        }
+    }//GEN-LAST:event_menuItem_ThongKeActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_main_img;
@@ -517,11 +577,11 @@ public class MainGUI extends javax.swing.JFrame {
     private javax.swing.JButton menuItem_BanAn;
     private javax.swing.JButton menuItem_DatBan;
     private javax.swing.JButton menuItem_HoaDon;
-    private javax.swing.JButton menuItem_KhachHang;
     private javax.swing.JButton menuItem_MonAn;
     private javax.swing.JButton menuItem_NhanVien;
     private javax.swing.JButton menuItem_TaiKhoan;
     private javax.swing.JButton menuItem_ThongKe;
+    private javax.swing.JButton menuItem_khuyenMai;
     private javax.swing.JLabel timeLabel;
     // End of variables declaration//GEN-END:variables
 }

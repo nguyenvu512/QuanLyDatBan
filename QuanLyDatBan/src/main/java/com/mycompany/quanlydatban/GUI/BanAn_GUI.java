@@ -34,6 +34,9 @@ public class BanAn_GUI extends javax.swing.JPanel {
     Color color_bg = Color.decode("#00405d");
     DefaultTableModel model_dsBan;
     JTable table_dsBan;
+    
+    private DefaultTableModel dtm;
+    private List<BanAn> list = BanAnDAO.getAllBan();
 
     /**
      * Creates new form MonAn_GUI
@@ -49,7 +52,7 @@ public class BanAn_GUI extends javax.swing.JPanel {
         jb_tim.setBackground(color_bg);
         jb_xoa.setBackground(color_bg);
         PlaceholderSupport placeholderSupport = new PlaceholderSupport();
-        placeholderSupport.addPlaceholder(jt_tim, " Nhập mã bàn để tìm kiếm");
+        placeholderSupport.addPlaceholder(txt_tim, " Nhập mã bàn để tìm kiếm");
 
         //        bảng ds món đã đặt
         String columnName[] = {"Mã bàn", "Số lượng ghế", "Ghi chú"};
@@ -59,15 +62,34 @@ public class BanAn_GUI extends javax.swing.JPanel {
         table_dsBan.setFont(new java.awt.Font("JetBrains Mono", 0, 14));
         JScrollPane jScrollPane_dsBan = new JScrollPane(table_dsBan);
         table_dsBan.setOpaque(true);
+        dtm = (DefaultTableModel)table_dsBan.getModel();
         // Lấy header của bảng và cài đặt font cho header
         JTableHeader tableHeader = table_dsBan.getTableHeader();
         tableHeader.setFont(new Font("JetBrains Mono", Font.BOLD, 12));
         tableHeader.setBackground(color_bg);
         tableHeader.setForeground(Color.WHITE);
+        dataToTable();
 
         jp_tableBan.add(jScrollPane_dsBan, BorderLayout.CENTER);
     }
 
+    public void dataToTable(){
+        for(BanAn b: list){
+            dtm.addRow(new Object[]{
+            b.getMaBan(),
+            b.getSoLuongGhe(),
+            b.getGhiChu()
+            });
+        }
+    }
+    
+    public void  xoaTrang()
+    {
+        txt_maBan.setText("");
+        txt_soLuongGhe.setText("");
+        txt_ghiChu.setText("");
+        txt_tim.setText("");
+    }     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -89,7 +111,7 @@ public class BanAn_GUI extends javax.swing.JPanel {
         l_maF1 = new javax.swing.JLabel();
         txt_maBan = new javax.swing.JTextField();
         jp_table = new javax.swing.JPanel();
-        jt_tim = new javax.swing.JTextField();
+        txt_tim = new javax.swing.JTextField();
         jb_tim = new javax.swing.JButton();
         jp_tableBan = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
@@ -132,6 +154,11 @@ public class BanAn_GUI extends javax.swing.JPanel {
         jb_xoa.setForeground(new java.awt.Color(255, 255, 255));
         jb_xoa.setText("XÓA");
         jb_xoa.setPreferredSize(new java.awt.Dimension(100, 50));
+        jb_xoa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jb_xoaActionPerformed(evt);
+            }
+        });
 
         jb_them.setBackground(new java.awt.Color(22, 78, 180));
         jb_them.setFont(new java.awt.Font("JetBrains Mono NL ExtraBold", 0, 18)); // NOI18N
@@ -187,8 +214,8 @@ public class BanAn_GUI extends javax.swing.JPanel {
 
         jp_table.setBackground(new java.awt.Color(255, 255, 255));
 
-        jt_tim.setFont(new java.awt.Font("JetBrains Mono", 0, 12)); // NOI18N
-        jt_tim.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        txt_tim.setFont(new java.awt.Font("JetBrains Mono", 0, 12)); // NOI18N
+        txt_tim.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jb_tim.setBackground(new java.awt.Color(22, 78, 180));
         jb_tim.setFont(new java.awt.Font("JetBrains Mono", 1, 12)); // NOI18N
@@ -207,7 +234,7 @@ public class BanAn_GUI extends javax.swing.JPanel {
         jp_tableLayout.setHorizontalGroup(
             jp_tableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jp_tableLayout.createSequentialGroup()
-                .addComponent(jt_tim, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txt_tim, javax.swing.GroupLayout.PREFERRED_SIZE, 183, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jb_tim, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(915, Short.MAX_VALUE))
@@ -217,7 +244,7 @@ public class BanAn_GUI extends javax.swing.JPanel {
             .addGroup(jp_tableLayout.createSequentialGroup()
                 .addGap(15, 15, 15)
                 .addGroup(jp_tableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jt_tim, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txt_tim, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jb_tim, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(390, 390, 390))
         );
@@ -235,10 +262,57 @@ public class BanAn_GUI extends javax.swing.JPanel {
 
     private void jb_timActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_timActionPerformed
         // TODO add your handling code here:
+        String maB = txt_tim.getText();
+        BanAnDAO ban_d = new BanAnDAO();
+        BanAn b = ban_d.tim(maB);
+        if(b!=null){
+            dtm.setRowCount(0);
+            dtm.addRow(new Object[]{
+                b.getMaBan(),
+                b.getSoLuongGhe(),
+                b.getGhiChu()
+            });
+        } 
+         else if(txt_tim.getText().equals(""))
+            {
+                dtm.setRowCount(0);
+                dataToTable();
+            }
+            else if(b== null) {
+                JOptionPane.showMessageDialog(this,"Không tìm thấy bàn ăn này");
+        
+        }
     }//GEN-LAST:event_jb_timActionPerformed
 
     private void jb_suaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_suaActionPerformed
         // TODO add your handling code here:
+        String maB = txt_maBan.getText();
+        BanAnDAO ban_d = new BanAnDAO();
+        BanAn b = ban_d.tim(maB);
+        if (b != null) {
+            int sl = 0;
+            try {
+            sl=Integer.parseInt(txt_soLuongGhe.getText());
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Số lượng ghế không hợp lệ! Vui lòng nhập một số.", "Lỗi nhập liệu", JOptionPane.ERROR_MESSAGE);
+            return; 
+        }
+            String ghichu = txt_ghiChu.getText();         
+            b.setSoLuongGhe(sl);
+            b.setGhiChu(ghichu);
+            ban_d.suaBan(b); 
+            dtm.setRowCount(0);
+            list = BanAnDAO.getAllBan();
+            dataToTable();
+            xoaTrang();
+            JOptionPane.showMessageDialog(this, "Sửa thành công!");
+            
+        }else if(b==null){
+            dtm.setRowCount(0);
+            list = BanAnDAO.getAllBan();
+            dataToTable();
+            JOptionPane.showMessageDialog(this, "Không tìm thấy!");
+        }
     }//GEN-LAST:event_jb_suaActionPerformed
 
     private void jb_themActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_themActionPerformed
@@ -263,6 +337,35 @@ public class BanAn_GUI extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jb_themActionPerformed
 
+    private void jb_xoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jb_xoaActionPerformed
+        // TODO add your handling code here:
+        int r = table_dsBan.getSelectedRow();
+        if (r != -1) {
+            int result = JOptionPane.showOptionDialog(
+                    this, // Parent component
+                    "Bạn có chắc chắn muốn xoá bàn này không?", // Message
+                    "Thông báo", // Title
+                    JOptionPane.YES_NO_OPTION, // Option type (Yes/No buttons)
+                    JOptionPane.QUESTION_MESSAGE, // Message type (icon)
+                    null, // Icon (null means default)
+                    null, // Possible options (null uses default Yes/No)
+                    null // Default option (null means first button, "Yes")
+            );
+            if (result == JOptionPane.YES_OPTION) {
+                BanAnDAO ban_d = new BanAnDAO();
+                if (ban_d.xoaBan(dtm.getValueAt(r, 0).toString())) {
+                    dtm.setRowCount(0);
+                    list=BanAnDAO.getAllBan();
+                    dataToTable();
+                    xoaTrang();
+                    JOptionPane.showMessageDialog(this, "Xóa thành công!");
+                }
+            }
+        } else
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn món ăn để xoá");
+        
+    }//GEN-LAST:event_jb_xoaActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -274,13 +377,13 @@ public class BanAn_GUI extends javax.swing.JPanel {
     private javax.swing.JPanel jp_food;
     private javax.swing.JPanel jp_table;
     private javax.swing.JPanel jp_tableBan;
-    private javax.swing.JTextField jt_tim;
     private javax.swing.JLabel l_gia;
     private javax.swing.JLabel l_maF;
     private javax.swing.JLabel l_maF1;
     private javax.swing.JTextField txt_ghiChu;
     private javax.swing.JTextField txt_maBan;
     private javax.swing.JTextField txt_soLuongGhe;
+    private javax.swing.JTextField txt_tim;
     // End of variables declaration//GEN-END:variables
 
 }

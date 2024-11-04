@@ -58,4 +58,26 @@ public class DanhMucMonAnDAO {
         }
         return null;
     }
+    
+    public static DanhMucMonAn getByTenDanhMuc(String ten) {
+        try {
+            java.sql.Connection c = Connection.getConnection();
+            String sql = "SELECT * FROM DanhMucMonAn WHERE tenDanhMuc = ?";
+            PreparedStatement st = c.prepareStatement(sql);
+            st.setString(1, ten);
+            ResultSet rs = st.executeQuery();
+
+            if (rs.next()) {
+                String maDanhMuc = rs.getString("maDanhMuc");
+                String tenDanhMuc = rs.getString("tenDanhMuc");
+                return DanhMucMonAn.builder()
+                        .maDanhMuc(maDanhMuc)
+                        .tenDanhMuc(tenDanhMuc)
+                        .build();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
